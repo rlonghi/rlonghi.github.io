@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Multi-Apping Gig Economy: An Interactive Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Chosen Palette: Sandstone & Sage -->
+  <!-- Application Structure Plan: The application is designed as a top-down narrative, starting with the most critical insight and progressively revealing more detailed information. This structure guides the user from the "what" to the "why" and "how."
+    1.  **Hero Section:** Immediately answers the user's primary question with a headline statistic.
+    2.  **Key Statistics:** Provides a quick, scannable overview of the most important findings.
+    3.  **Distribution Analysis:** Uses an interactive donut chart to visualize the core data point—how many apps workers use. This is the central piece of evidence.
+    4.  **Motivations:** Explores the reasons behind multi-apping with a bar chart, adding qualitative depth.
+    5.  **Sector Deep Dive:** An interactive section allowing users to filter data by gig work category (e.g., Rideshare, Delivery). This empowers users to explore areas of specific interest, making the data more relevant to them.
+    6.  **Platform Overlap:** A heatmap-style grid visually demonstrates the relationships between specific apps.
+    This structure was chosen because it mirrors a natural discovery process, making complex data digestible and engaging without overwhelming the user. It prioritizes clarity and user-driven exploration. -->
+  <!-- Visualization & Content Choices:
+    - Report Info: Overall percentage of workers using multiple apps. -> Goal: Inform/Hook. -> Viz: Large headline text. -> Interaction: None. -> Justification: Immediate, high-impact answer to the core question. -> Method: HTML/Tailwind.
+    - Report Info: Specific counts of app usage (1, 2, 3+). -> Goal: Show Proportions. -> Viz: Donut Chart. -> Interaction: Hover for tooltips with exact percentages. -> Justification: Ideal for showing parts of a whole clearly. -> Library: Chart.js (Canvas).
+    - Report Info: Reasons for multi-apping. -> Goal: Compare/Rank. -> Viz: Horizontal Bar Chart. -> Interaction: Hover for tooltips. -> Justification: Excellent for ranking categorical data and showing relative importance. -> Library: Chart.js (Canvas).
+    - Report Info: App usage within specific sectors (delivery, rideshare). -> Goal: Organize/Filter. -> Viz: Bar Chart updated by filter buttons. -> Interaction: Click buttons to change chart data. -> Justification: The key interactive element, allowing users to drill down into the data that is most relevant to them. -> Library/Method: Chart.js (Canvas) with JS event handlers.
+    - Report Info: Overlap between popular platforms. -> Goal: Show Relationships. -> Viz: HTML/CSS Grid styled as a heatmap. -> Interaction: Hover to reveal exact percentage in a tooltip. -> Justification: A highly visual and intuitive way to represent complex cross-platform relationships without a cluttered chart. -> Method: HTML/Tailwind/JS.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FDFBF7;
+      color: #4A4A4A;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      height: 300px;
+      margin: auto;
+    }
+
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 350px;
+        max-width: 500px;
+      }
+    }
+
+    .nav-button {
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+    }
+
+    .nav-button.active,
+    .nav-button:hover {
+      border-bottom-color: #3B82F6;
+      color: #1E40AF;
+    }
+
+    .heatmap-cell {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .heatmap-cell:hover {
+      transform: scale(1.05);
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <header class="text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight">The Gig Economy's New Norm</h1>
+      <p class="mt-4 text-xl md:text-2xl text-blue-600 font-semibold">A Deep Dive into Multi-Apping</p>
+    </header>
+
+    <main class="space-y-20">
+      <section id="overview" class="text-center">
+        <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-10">
+          The strategy of "multi-apping"—working across multiple platforms—has become standard practice for a significant portion of gig workers. This interactive report explores the prevalence of this trend, the motivations behind it, and the specific ways workers combine apps to optimize their income and time. The data reveals a sophisticated workforce actively managing a portfolio of gig opportunities.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <div class="text-5xl font-bold text-blue-600">68%</div>
+            <div class="mt-2 text-gray-700 font-semibold">Use Multiple Apps</div>
+            <p class="text-sm text-gray-500 mt-1">The majority of gig workers leverage more than one platform.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <div class="text-5xl font-bold text-blue-600">2.4</div>
+            <div class="mt-2 text-gray-700 font-semibold">Average Apps Used</div>
+            <p class="text-sm text-gray-500 mt-1">On average, workers are active on more than two platforms.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <div class="text-5xl font-bold text-blue-600">35%</div>
+            <div class="mt-2 text-gray-700 font-semibold">Are "Power Users"</div>
+            <p class="text-sm text-gray-500 mt-1">A significant segment uses three or more different applications regularly.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="distribution">
+        <h2 class="text-3xl font-bold text-center text-gray-800">How Many Apps Do Workers Use?</h2>
+        <p class="max-w-2xl mx-auto text-center text-gray-600 mt-4 mb-8">
+          While using a single app is still common, the data clearly shows a strategic shift towards diversification. A large and growing number of workers are active on two, three, or even more platforms simultaneously. This chart visualizes the breakdown of the gig workforce by the number of apps they use. Hover over a segment to see the precise percentage.
+        </p>
+        <div class="chart-container">
+          <canvas id="appDistributionChart"></canvas>
+        </div>
+      </section>
+
+      <section id="motivations">
+        <h2 class="text-3xl font-bold text-center text-gray-800">Why Go Multi-Platform?</h2>
+        <p class="max-w-2xl mx-auto text-center text-gray-600 mt-4 mb-8">
+          The decision to multi-app is driven by clear economic and strategic incentives. From maximizing earning potential to simply filling idle time between gigs, workers have compelling reasons to diversify their platform portfolio. This chart ranks the primary motivations cited by gig workers.
+        </p>
+        <div class="w-full max-w-3xl mx-auto h-96 md:h-[450px]">
+          <canvas id="motivationsChart"></canvas>
+        </div>
+      </section>
+
+      <section id="sector-deep-dive">
+        <h2 class="text-3xl font-bold text-center text-gray-800">Sector-Specific Trends</h2>
+        <p class="max-w-2xl mx-auto text-center text-gray-600 mt-4 mb-8">
+          Multi-apping strategies vary significantly across different sectors of the gig economy. For example, the dynamics in ridesharing are different from those in freelance creative services. Use the filters below to explore app usage patterns within specific work categories and see how the distribution changes.
+        </p>
+        <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+          <button class="nav-button active px-4 py-2 font-semibold text-gray-600" data-sector="all">All Sectors</button>
+          <button class="nav-button px-4 py-2 font-semibold text-gray-600" data-sector="rideshare">Rideshare</button>
+          <button class="nav-button px-4 py-2 font-semibold text-gray-600" data-sector="delivery">Food Delivery</button>
+          <button class="nav-button px-4 py-2 font-semibold text-gray-600" data-sector="freelance">Freelance</button>
+        </div>
+        <div class="w-full max-w-3xl mx-auto h-96 md:h-[450px]">
+          <canvas id="sectorChart"></canvas>
+        </div>
+      </section>
+
+      <section id="platform-overlap">
+        <h2 class="text-3xl font-bold text-center text-gray-800">Platform Overlap Matrix</h2>
+        <p class="max-w-2xl mx-auto text-center text-gray-600 mt-4 mb-8">
+          Which apps are most commonly used together? This matrix shows the percentage of workers on a primary platform (listed on the left) who also work on other popular platforms (listed on the top). A darker cell indicates a higher degree of overlap. Hover over any cell to see the specific percentage.
+        </p>
+        <div class="max-w-4xl mx-auto bg-white p-4 rounded-lg shadow-md border border-gray-200">
+          <div id="heatmap" class="grid grid-cols-6 gap-1 text-xs md:text-sm">
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="text-center py-8 mt-12 border-t border-gray-200">
+    <p class="text-gray-500">Interactive Report generated on <span id="report-date"></span>.</p>
+    <p class="text-xs text-gray-400 mt-2">Data is synthesized from industry reports and surveys for illustrative purposes.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('report-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const chartColors = {
+        blue: 'rgba(59, 130, 246, 0.7)',
+        sky: 'rgba(14, 165, 233, 0.7)',
+        teal: 'rgba(20, 184, 166, 0.7)',
+        amber: 'rgba(245, 158, 11, 0.7)',
+        gray: 'rgba(107, 114, 128, 0.7)',
+        blueBorder: 'rgba(59, 130, 246, 1)',
+        skyBorder: 'rgba(14, 165, 233, 1)',
+        tealBorder: 'rgba(20, 184, 166, 1)',
+        amberBorder: 'rgba(245, 158, 11, 1)',
+        grayBorder: 'rgba(107, 114, 128, 1)',
+      };
+
+      function formatTooltipLabel(context) {
+        let label = context.dataset.label || '';
+        if (label) {
+          label += ': ';
+        }
+        if (context.parsed.x !== null) {
+          label += context.parsed.x + '%';
+        }
+        return label;
+      }
+
+      const dataStore = {
+        distribution: {
+          labels: ['1 App', '2 Apps', '3 Apps', '4+ Apps'],
+          data: [32, 33, 20, 15]
+        },
+        motivations: {
+          labels: ['Increase/Supplement Income', 'Fill Downtime Between Gigs', 'Access Different Types of Work', 'Take Advantage of Bonuses', 'Hedge Against Deactivation'],
+          data: [85, 62, 45, 38, 25]
+        },
+        sectors: {
+          all: {
+            labels: ['Uber', 'DoorDash', 'Lyft', 'Uber Eats', 'Instacart', 'Upwork'],
+            data: [55, 52, 40, 38, 30, 15]
+          },
+          rideshare: {
+            labels: ['Uber', 'Lyft', 'DoorDash', 'Uber Eats'],
+            data: [98, 95, 25, 22]
+          },
+          delivery: {
+            labels: ['DoorDash', 'Uber Eats', 'Instacart', 'Grubhub', 'Shipt'],
+            data: [88, 85, 55, 40, 20]
+          },
+          freelance: {
+            labels: ['Upwork', 'Fiverr', 'Toptal', 'Freelancer.com'],
+            data: [90, 75, 20, 18]
+          }
+        },
+        overlap: {
+          platforms: ['Uber', 'Lyft', 'DoorDash', 'Instacart', 'Upwork'],
+          data: [
+            [100, 78, 45, 20, 5],
+            [82, 100, 42, 18, 4],
+            [35, 30, 100, 55, 8],
+            [15, 12, 60, 100, 6],
+            [2, 1, 5, 4, 100]
+          ]
+        }
+      };
+
+      const tooltipConfig = {
+        backgroundColor: '#fff',
+        titleColor: '#333',
+        bodyColor: '#555',
+        borderColor: '#ddd',
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 5,
+        displayColors: false
+      };
+
+      const appDistributionCtx = document.getElementById('appDistributionChart').getContext('2d');
+      new Chart(appDistributionCtx, {
+        type: 'doughnut',
+        data: {
+          labels: dataStore.distribution.labels,
+          datasets: [{
+            data: dataStore.distribution.data,
+            backgroundColor: [chartColors.blue, chartColors.sky, chartColors.teal, chartColors.amber],
+            borderColor: '#FDFBF7',
+            borderWidth: 4,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                font: { size: 14 }
+              }
+            },
+            tooltip: {
+              ...tooltipConfig,
+              callbacks: {
+                label: (context) => `${context.label}: ${context.raw}%`
+              }
+            }
+          },
+          cutout: '60%'
+        }
+      });
+
+      const motivationsCtx = document.getElementById('motivationsChart').getContext('2d');
+      new Chart(motivationsCtx, {
+        type: 'bar',
+        data: {
+          labels: dataStore.motivations.labels,
+          datasets: [{
+            label: 'Percentage of Workers Citing Reason',
+            data: dataStore.motivations.data,
+            backgroundColor: [chartColors.blue, chartColors.sky, chartColors.teal, chartColors.amber, chartColors.gray],
+            borderColor: [chartColors.blueBorder, chartColors.skyBorder, chartColors.tealBorder, chartColors.amberBorder, chartColors.grayBorder],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: {
+                callback: (value) => value + '%'
+              }
+            },
+            y: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              ...tooltipConfig,
+              callbacks: { label: formatTooltipLabel }
+            }
+          }
+        }
+      });
+
+      let sectorChart;
+      const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+      function createOrUpdateSectorChart(sector) {
+        const sectorData = dataStore.sectors[sector];
+        if (sectorChart) {
+          sectorChart.destroy();
+        }
+        sectorChart = new Chart(sectorCtx, {
+          type: 'bar',
+          data: {
+            labels: sectorData.labels,
+            datasets: [{
+              label: 'Platform Usage (%)',
+              data: sectorData.data,
+              backgroundColor: chartColors.blue,
+              borderColor: chartColors.blueBorder,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: (value) => value + '%'
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                ...tooltipConfig,
+                callbacks: {
+                  label: (context) => `${context.dataset.label}: ${context.parsed.y}%`
+                }
+              }
+            }
+          }
+        });
+      }
+
+      const navButtons = document.querySelectorAll('.nav-button');
+      navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          navButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          createOrUpdateSectorChart(button.dataset.sector);
+        });
+      });
+
+      createOrUpdateSectorChart('all');
+
+      const heatmapContainer = document.getElementById('heatmap');
+      const platforms = dataStore.overlap.platforms;
+      const heatmapData = dataStore.overlap.data;
+
+      heatmapContainer.innerHTML += `<div class="font-bold p-2"></div>`;
+      platforms.forEach(p => {
+        heatmapContainer.innerHTML += `<div class="font-bold p-2 text-center">${p}</div>`;
+      });
+
+      heatmapData.forEach((row, i) => {
+        heatmapContainer.innerHTML += `<div class="font-bold p-2 text-right">${platforms[i]}</div>`;
+        row.forEach((value, j) => {
+          if (i === j) {
+            heatmapContainer.innerHTML += `<div class="heatmap-cell bg-gray-300 flex items-center justify-center p-2 rounded-md font-bold text-gray-600">100%</div>`;
+          } else {
+            const opacity = value / 100;
+            heatmapContainer.innerHTML += `<div class="heatmap-cell flex items-center justify-center p-2 rounded-md text-white font-bold" style="background-color: rgba(59, 130, 246, ${opacity});" title="${platforms[i]} -> ${platforms[j]}: ${value}%">${value}%</div>`;
+          }
+        });
+      });
+
+    });
+  </script>
+</body>
+
+</html>

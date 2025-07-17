@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Gig Economy: A Shifting Work Landscape</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Chosen Palette: Warm Neutral Harmony -->
+  <!-- Application Structure Plan: The SPA is designed as a narrative journey for the user. It starts with a high-level overview (Hero section with key stats), then dives into the core data (Growth Trends), explores the human element (The Workforce), analyzes the underlying forces (Drivers & Challenges), and concludes with a forward-looking perspective (The Horizon). This top-down structure allows users to grasp the main points quickly and then explore details progressively. Navigation is facilitated by a sticky header, enabling non-linear exploration for users who want to jump to specific topics. This structure was chosen over a simple report layout to make the data more engaging and digestible, guiding the user through a story rather than just presenting facts. -->
+  <!-- Visualization & Content Choices: 
+        1. Growth Data -> Goal: Show change over time -> Viz: Combined Line Chart (Chart.js) -> Interaction: Buttons to toggle historical vs. projected data -> Justification: Effectively visualizes trends for two different metrics (workers, market size) over a continuous period. The interaction allows users to focus on specific timeframes.
+        2. Worker Motivation -> Goal: Show proportions -> Viz: Donut Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Clearly communicates the composition of the workforce's primary drivers in an easily understood format.
+        3. Top Sectors -> Goal: Compare categories -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Ideal for comparing the magnitude of different work sectors and identifying the most prevalent ones.
+        4. Drivers/Challenges/Future Trends -> Goal: Organize qualitative info -> Viz: Styled HTML/CSS lists with icons -> Interaction: None -> Justification: Presents key textual insights in a scannable, visually organized manner that is clearer than dense paragraphs.
+    -->
+  <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 300px;
+      max-height: 400px;
+    }
+
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800">
+
+  <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+    <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex-shrink-0">
+          <h2 class="text-xl font-bold text-stone-900">Gig Economy Report</h2>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="#growth" class="text-stone-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">Growth</a>
+            <a href="#workforce" class="text-stone-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">Workforce</a>
+            <a href="#forces" class="text-stone-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">Forces</a>
+            <a href="#horizon" class="text-stone-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">The Horizon</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+    <section id="hero" class="text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-stone-900 mb-4">The Rise of the Independent Workforce</h1>
+      <p class="max-w-3xl mx-auto text-lg text-stone-600 mb-8">The gig economy is no longer a fringe concept but a fundamental component of the modern labor market. This report explores its rapid evolution, key growth drivers, and future trajectory, providing an interactive look at the data shaping the future of work.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="text-4xl font-bold text-teal-600">~78M</div>
+          <p class="text-stone-500 mt-2">Freelancers in the U.S. (2024 Est.)</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="text-4xl font-bold text-teal-600">$873B</div>
+          <p class="text-stone-500 mt-2">Projected Global Market Size (2028)</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="text-4xl font-bold text-teal-600">>50%</div>
+          <p class="text-stone-500 mt-2">Projected U.S. Workforce Share by 2028</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="growth" class="py-12 bg-white rounded-xl shadow-lg mb-16">
+      <div class="text-center mb-8 px-4">
+        <h2 class="text-3xl font-bold text-stone-900">The Growth Story</h2>
+        <p class="max-w-3xl mx-auto text-stone-600 mt-2">This section visualizes the explosive growth of the gig economy, tracking both the number of independent workers in the U.S. and the global market value. Use the buttons below to toggle between historical data from the last five years and future projections to see the full scope of this transformation.</p>
+        <div class="mt-6">
+          <button id="historicalBtn" class="bg-teal-600 text-white px-4 py-2 rounded-md font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">Historical (2020-2024)</button>
+          <button id="projectedBtn" class="bg-stone-200 text-stone-700 px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-stone-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-400">Projections (2025-2028)</button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </section>
+
+    <section id="workforce" class="py-12 mb-16">
+      <div class="text-center mb-12 px-4">
+        <h2 class="text-3xl font-bold text-stone-900">Who Are the Gig Workers?</h2>
+        <p class="max-w-3xl mx-auto text-stone-600 mt-2">Beyond the numbers, it's crucial to understand the people who comprise the gig workforce. This section breaks down their primary motivations for choosing independent work and highlights the most common sectors they operate in, painting a clearer picture of the modern freelancer.</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-semibold text-center mb-4 text-stone-800">Primary Motivation</h3>
+          <div class="chart-container h-64 md:h-80">
+            <canvas id="motivationChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-semibold text-center mb-4 text-stone-800">Top Freelance Sectors</h3>
+          <div class="chart-container h-64 md:h-80">
+            <canvas id="sectorsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="forces" class="py-12 bg-white rounded-xl shadow-lg mb-16">
+      <div class="text-center mb-12 px-4">
+        <h2 class="text-3xl font-bold text-stone-900">Forces of Change</h2>
+        <p class="max-w-3xl mx-auto text-stone-600 mt-2">The gig economy's expansion is not accidental; it is propelled by powerful drivers and simultaneously shaped by significant challenges. This section contrasts the key factors accelerating its growth with the hurdles that workers and regulators face, providing a balanced view of the ecosystem.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
+        <div>
+          <h3 class="text-2xl font-semibold text-green-700 mb-4 flex items-center"><span class="mr-2">📈</span> Driving Forces</h3>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3 mt-1">✓</span>
+              <div>
+                <h4 class="font-semibold">Technological Platforms</h4>
+                <p class="text-stone-600">Digital apps and websites seamlessly connect workers with a global client base, lowering barriers to entry.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3 mt-1">✓</span>
+              <div>
+                <h4 class="font-semibold">Desire for Flexibility</h4>
+                <p class="text-stone-600">Workers increasingly prioritize autonomy, control over their schedules, and work-life balance.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3 mt-1">✓</span>
+              <div>
+                <h4 class="font-semibold">Access to Diverse Talent</h4>
+                <p class="text-stone-600">Businesses can tap into a specialized, on-demand talent pool without the overhead of full-time hires.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-2xl font-semibold text-red-700 mb-4 flex items-center"><span class="mr-2">⚠️</span> Key Challenges</h3>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <span class="text-red-500 mr-3 mt-1">✗</span>
+              <div>
+                <h4 class="font-semibold">Lack of Benefits & Security</h4>
+                <p class="text-stone-600">Independent contractors often lack access to health insurance, retirement plans, and paid leave.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-red-500 mr-3 mt-1">✗</span>
+              <div>
+                <h4 class="font-semibold">Income Instability</h4>
+                <p class="text-stone-600">Work can be unpredictable, leading to fluctuating income and financial insecurity for many.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-red-500 mr-3 mt-1">✗</span>
+              <div>
+                <h4 class="font-semibold">Regulatory Uncertainty</h4>
+                <p class="text-stone-600">Debates over worker classification (employee vs. contractor) create legal complexities for platforms and workers.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="horizon" class="py-12">
+      <div class="text-center mb-12 px-4">
+        <h2 class="text-3xl font-bold text-stone-900">The Horizon</h2>
+        <p class="max-w-3xl mx-auto text-stone-600 mt-2">Looking ahead, the gig economy is set to continue its evolution. Several key trends are shaping its future, from the integration of artificial intelligence to new policy discussions and the influence of younger generations. This section explores what's next for the world of independent work.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="font-semibold text-lg mb-2 text-stone-800">AI Integration</h3>
+          <p class="text-stone-600">Artificial intelligence is poised to become a powerful tool for freelancers, automating tasks, enhancing creativity, and creating new service opportunities rather than simply replacing jobs.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="font-semibold text-lg mb-2 text-stone-800">Gen Z's Influence</h3>
+          <p class="text-stone-600">The youngest generation in the workforce is increasingly choosing freelancing for greater control over their career paths and skill development, accelerating the shift away from traditional 9-to-5 roles.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="font-semibold text-lg mb-2 text-stone-800">Push for Portable Benefits</h3>
+          <p class="text-stone-600">As the gig workforce grows, so do calls for new systems of "portable benefits" that are tied to the individual worker, not a specific employer, addressing a key challenge of independent work.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-stone-800 text-stone-300 mt-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+      <p>Data compiled and visualized from various 2024-2025 market reports and labor statistics.</p>
+      <p class="text-sm text-stone-400">This is an interactive report for informational purposes.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const historicalData = {
+        labels: ['2020', '2021', '2022', '2023', '2024'],
+        workers: [59, 61.1, 64, 73.3, 78],
+        marketSize: [301, 350, 401, 455, 557]
+      };
+
+      const projectedData = {
+        labels: ['2025', '2026', '2027', '2028'],
+        workers: [82, 85.5, 88, 90.1],
+        marketSize: [647, 725, 804, 873]
+      };
+
+      const motivationData = {
+        labels: ['Side Hustle / Supplemental Income', 'Primary Source of Income', 'Flexibility / Passion'],
+        data: [50, 30, 20]
+      };
+
+      const sectorsData = {
+        labels: ['Tech & Creative', 'Professional & Consulting', 'Transportation & Delivery', 'Other Services'],
+        data: [40, 28, 18, 14]
+      };
+
+      const growthCtx = document.getElementById('growthChart').getContext('2d');
+      const motivationCtx = document.getElementById('motivationChart').getContext('2d');
+      const sectorsCtx = document.getElementById('sectorsChart').getContext('2d');
+
+      let growthChart;
+
+      const chartConfig = {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'U.S. Gig Workers (Millions)',
+            data: [],
+            borderColor: 'rgb(20, 184, 166)',
+            backgroundColor: 'rgba(20, 184, 166, 0.1)',
+            yAxisID: 'y',
+            tension: 0.1,
+            fill: true,
+          }, {
+            label: 'Global Market Size ($ Billions)',
+            data: [],
+            borderColor: 'rgb(217, 119, 6)',
+            backgroundColor: 'rgba(217, 119, 6, 0.1)',
+            yAxisID: 'y1',
+            tension: 0.1,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          plugins: {
+            title: {
+              display: false,
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    if (context.dataset.yAxisID === 'y') {
+                      label += context.parsed.y + 'M';
+                    } else {
+                      label += '$' + context.parsed.y + 'B';
+                    }
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'U.S. Workers (Millions)'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Global Market Size ($B)'
+              },
+              grid: {
+                drawOnChartArea: true,
+                color: 'rgba(0,0,0,0.05)'
+              },
+            },
+          }
+        }
+      };
+
+      function updateGrowthChart(data) {
+        if (growthChart) {
+          growthChart.data.labels = data.labels;
+          growthChart.data.datasets[0].data = data.workers;
+          growthChart.data.datasets[1].data = data.marketSize;
+          growthChart.update();
+        } else {
+          chartConfig.data.labels = data.labels;
+          chartConfig.data.datasets[0].data = data.workers;
+          chartConfig.data.datasets[1].data = data.marketSize;
+          growthChart = new Chart(growthCtx, chartConfig);
+        }
+      }
+
+      new Chart(motivationCtx, {
+        type: 'doughnut',
+        data: {
+          labels: motivationData.labels,
+          datasets: [{
+            label: 'Motivation',
+            data: motivationData.data,
+            backgroundColor: ['rgb(13, 148, 136)', 'rgb(217, 119, 6)', 'rgb(148, 163, 184)'],
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed !== null) {
+                    label += context.parsed + '%';
+                  }
+                  return label;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      new Chart(sectorsCtx, {
+        type: 'bar',
+        data: {
+          labels: sectorsData.labels,
+          datasets: [{
+            label: '% of Freelancers',
+            data: sectorsData.data,
+            backgroundColor: ['rgba(20, 184, 166, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(100, 116, 139, 0.7)', 'rgba(156, 163, 175, 0.7)'],
+            borderColor: ['rgb(20, 184, 166)', 'rgb(245, 158, 11)', 'rgb(100, 116, 139)', 'rgb(156, 163, 175)'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Percentage (%)'
+              }
+            }
+          }
+        }
+      });
+
+      const histBtn = document.getElementById('historicalBtn');
+      const projBtn = document.getElementById('projectedBtn');
+
+      histBtn.addEventListener('click', () => {
+        updateGrowthChart(historicalData);
+        histBtn.classList.remove('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
+        histBtn.classList.add('bg-teal-600', 'text-white');
+        projBtn.classList.remove('bg-teal-600', 'text-white');
+        projBtn.classList.add('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
+      });
+
+      projBtn.addEventListener('click', () => {
+        updateGrowthChart(projectedData);
+        projBtn.classList.remove('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
+        projBtn.classList.add('bg-teal-600', 'text-white');
+        histBtn.classList.remove('bg-teal-600', 'text-white');
+        histBtn.classList.add('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
+      });
+
+      updateGrowthChart(historicalData);
+    });
+  </script>
+</body>
+
+</html>
